@@ -57,6 +57,7 @@ header {
   gap: 20px;
   padding: 28px 56px;
   border-bottom: 1px solid var(--line);
+  animation: site-enter 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .brand {
@@ -64,6 +65,7 @@ header {
   font-weight: 800;
   line-height: 1;
   letter-spacing: -3px;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .brand span {
@@ -80,6 +82,26 @@ nav {
   display: flex;
   gap: 34px;
   font-size: 14px;
+}
+
+nav a,
+.nav-contact {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+nav a::after,
+.nav-contact::after {
+  position: absolute;
+  right: 0;
+  bottom: -7px;
+  left: 0;
+  height: 1px;
+  background: var(--accent);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s ease;
 }
 
 nav a:hover,
@@ -100,6 +122,10 @@ nav a:hover,
   padding: 77px 56px 64px;
 }
 
+.hero > .eyebrow {
+  animation: hero-reveal 0.65s 0.08s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .eyebrow {
   display: flex;
   align-items: center;
@@ -116,12 +142,34 @@ nav a:hover,
   background: var(--accent);
 }
 
+.hero .small-line {
+  animation: line-grow 0.65s 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left;
+}
+
 h1 {
   margin: 35px 0 38px;
   font-size: clamp(64px, 8.3vw, 112px);
   font-weight: 500;
   line-height: 1.04;
   letter-spacing: -6px;
+}
+
+.hero-line {
+  display: block;
+  animation: hero-reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-line:nth-child(1) {
+  animation-delay: 0.12s;
+}
+
+.hero-line:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.hero-line:nth-child(3) {
+  animation-delay: 0.28s;
 }
 
 em {
@@ -132,6 +180,7 @@ em {
 
 .outline {
   color: var(--muted);
+  transition: color 0.35s ease;
 }
 
 .hero-bottom {
@@ -139,6 +188,7 @@ em {
   align-items: end;
   justify-content: space-between;
   gap: 28px;
+  animation: hero-reveal 0.75s 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .hero-bottom p {
@@ -155,6 +205,7 @@ em {
 }
 
 .button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -164,11 +215,15 @@ em {
   border-radius: 5px;
   font-size: 14px;
   font-weight: 600;
-  transition: background 0.2s, transform 0.2s;
+  overflow: hidden;
+  transition: background 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.25s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .button:hover {
   background: #2c352a;
+  border-color: #556153;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
@@ -180,6 +235,7 @@ em {
 
 .primary:hover {
   background: #dbff97;
+  border-color: #dbff97;
 }
 
 .hero-index {
@@ -192,6 +248,7 @@ em {
   font-family: monospace;
   font-size: 13px;
   line-height: 1.9;
+  animation: hero-reveal 0.7s 0.44s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .hero-index span {
@@ -209,6 +266,11 @@ em {
   border-block: 1px solid var(--line);
   color: var(--muted);
   font-size: 14px;
+  animation: hero-reveal 0.7s 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.stack-strip span {
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .stack-strip b {
@@ -248,6 +310,8 @@ h2 {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--panel);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease,
+    transform 0.3s ease;
 }
 
 .featured {
@@ -277,6 +341,7 @@ h2 {
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: -1px;
+  transition: color 0.25s ease;
 }
 
 .project p {
@@ -302,6 +367,8 @@ h2 {
   border-radius: 4px;
   color: #c8d4c4;
   font-size: 12px;
+  transition: background 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease, transform 0.2s ease;
 }
 
 details {
@@ -310,13 +377,39 @@ details {
 }
 
 summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  list-style: none;
   color: var(--accent);
   font-size: 14px;
   cursor: pointer;
 }
 
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::after {
+  color: var(--accent);
+  content: "+";
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform 0.25s ease;
+}
+
+details[open] summary::after {
+  transform: rotate(45deg);
+}
+
 details p {
   margin-bottom: 0;
+}
+
+details[open] p {
+  animation: details-reveal 0.35s ease both;
 }
 
 .architecture {
@@ -351,6 +444,8 @@ details p {
   background: #263523;
   font-size: 16px;
   text-align: center;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease,
+    transform 0.25s ease;
 }
 
 .diagram-node span,
@@ -373,6 +468,8 @@ details p {
 .connector {
   height: 25px;
   border-left: 1px solid #889e6b;
+  transform-origin: top;
+  transition: border-color 0.25s ease, transform 0.25s ease;
 }
 
 .answer {
@@ -394,11 +491,26 @@ details p {
 }
 
 .job {
+  position: relative;
   display: grid;
   grid-template-columns: 190px 1fr 150px;
   gap: 28px;
   padding: 34px 0;
   border-top: 1px solid var(--line);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.job::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--accent);
+  content: "";
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease;
 }
 
 .job-date {
@@ -454,6 +566,7 @@ details p {
   color: var(--fg);
   font-size: 24px;
   font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .about {
@@ -500,12 +613,14 @@ details p {
 .skills > div {
   padding: 18px 0;
   border-bottom: 1px solid var(--line);
+  transition: border-color 0.25s ease, padding-left 0.25s ease;
 }
 
 .skills h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 500;
+  transition: color 0.25s ease;
 }
 
 .skills p {
@@ -529,6 +644,7 @@ details p {
   border-bottom: 1px solid #6e7b61;
   font-size: clamp(16px, 2.3vw, 26px);
   overflow-wrap: anywhere;
+  transition: border-color 0.2s ease, color 0.2s ease;
 }
 
 .contact-actions {
@@ -556,6 +672,159 @@ footer {
 
 .skip:focus {
   top: 12px;
+}
+
+@keyframes site-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes line-grow {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes details-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes section-reveal {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  nav a:hover::after,
+  .nav-contact:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .brand:hover {
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .hero:hover .outline {
+    color: #c1c9c2;
+  }
+
+  .stack-strip span:hover {
+    color: var(--fg);
+    transform: translateY(-2px);
+  }
+
+  .project:hover {
+    border-color: #526050;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
+  }
+
+  .project:hover h3 {
+    color: var(--accent);
+  }
+
+  .tags span:hover {
+    border-color: #718064;
+    background: #252d26;
+    color: var(--fg);
+    transform: translateY(-1px);
+  }
+
+  .architecture:hover .diagram-node,
+  .architecture:hover .diagram-pair > div {
+    border-color: #7b8e68;
+    transform: translateY(-2px);
+  }
+
+  .architecture:hover .connector {
+    border-color: var(--accent);
+    transform: scaleY(1.08);
+  }
+
+  .architecture:hover .answer {
+    box-shadow: 0 0 0 3px rgba(201, 245, 104, 0.08);
+  }
+
+  .job:hover {
+    border-color: #526050;
+    background: #151a17;
+  }
+
+  .job:hover::before {
+    transform: scaleY(1);
+  }
+
+  .job:hover .metrics strong {
+    color: var(--accent);
+  }
+
+  .skills > div:hover {
+    padding-left: 10px;
+    border-color: #526050;
+  }
+
+  .skills > div:hover h3,
+  .email:hover {
+    color: var(--accent);
+  }
+
+  .email:hover {
+    border-color: var(--accent);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .section-title,
+  .project,
+  .job,
+  .about > div,
+  .contact {
+    animation: section-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 28%;
+  }
 }
 
 @media (min-width: 1450px) {
@@ -753,7 +1022,22 @@ footer {
     scroll-behavior: auto;
   }
 
-  .button {
-    transition: none;
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .button:hover,
+  .brand:hover,
+  .stack-strip span:hover,
+  .project:hover,
+  .tags span:hover,
+  .architecture:hover .diagram-node,
+  .architecture:hover .diagram-pair > div,
+  .architecture:hover .connector {
+    transform: none;
   }
 }
