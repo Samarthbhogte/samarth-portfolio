@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Samarth Bhogte | Software Engineer</title>
 <meta name="description" content="Software engineer in Boston building full-stack, mobile, and AI-powered applications.">
+<script>document.documentElement.classList.add('js')</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -76,11 +77,33 @@ h1{font-family:var(--font-display);font-weight:800;font-size:clamp(2.7rem,6.2vw,
 .stage{position:relative;height:clamp(380px,72vh,700px)}
 .stage canvas{width:100%;height:100%}
 .hint{position:absolute;bottom:.5rem;left:50%;transform:translateX(-50%);font-size:.85rem;color:var(--muted);white-space:nowrap;margin:0}
-@media (pointer:coarse){.hint{display:none}}
-.intro-fade{opacity:0;transform:translateY(14px);animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}
-.intro-fade.d2{animation-delay:.12s}.intro-fade.d3{animation-delay:.24s}.intro-fade.d4{animation-delay:.36s}
+.js .intro-fade{opacity:0;transform:translateY(14px)}
+.js.entered .intro-fade{animation:rise .9s cubic-bezier(.2,.7,.2,1) .2s forwards}
+.js.entered .intro-fade.d2{animation-delay:.32s}.js.entered .intro-fade.d3{animation-delay:.44s}.js.entered .intro-fade.d4{animation-delay:.56s}
 @keyframes rise{to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){.intro-fade{animation:none;opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.js .intro-fade,.js.entered .intro-fade{animation:none;opacity:1;transform:none}}
+.desk-tip{position:absolute;left:0;top:0;z-index:2;pointer-events:none;padding:.45rem .85rem;border-radius:10px;background:var(--ink);color:var(--bg);font-weight:600;font-size:.88rem;white-space:nowrap;opacity:0;transition:opacity .18s;margin-top:-10px}
+.desk-tip.show{opacity:1}
+
+/* Intro gate */
+.gate{display:none}
+.js .gate{display:block;position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse 80% 70% at 50% 42%,var(--surface) 0%,var(--bg) 72%);transition:opacity .6s ease}
+.js .gate[hidden]{display:none}
+.gate.leaving{opacity:0;pointer-events:none}
+.gate-stage{position:absolute;inset:0}
+.gate-stage canvas{width:100%;height:100%;touch-action:none}
+.gate-ui{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px) + 18px) clamp(1.2rem,4vw,2.5rem) calc(env(safe-area-inset-bottom,0px) + 5vh);transition:opacity .35s}
+.gate.busy .gate-ui{opacity:0}
+.gate-top{display:flex;justify-content:space-between;align-items:center}
+.gate-top > *{pointer-events:auto}
+.gate-bottom{display:flex;flex-direction:column;align-items:center;gap:.7rem;text-align:center}
+.gate-bottom > *{pointer-events:auto}
+.gate-bottom p{margin:0;color:var(--muted);font-size:.92rem}
+.btn-big{padding:1rem 1.8rem;font-size:1.05rem}
+.link-btn{background:none;border:0;color:var(--muted);font:inherit;font-size:.92rem;cursor:pointer;padding:.4rem .2rem;text-decoration:underline;text-underline-offset:3px}
+.link-btn:hover{color:var(--ink)}
+body.gated{overflow:hidden}
+main:focus{outline:none}
 @media (max-width:900px){
   .hero{grid-template-columns:1fr;min-height:auto;padding-top:2.5rem}
   .stage{height:clamp(300px,78vw,480px);order:-1;margin-inline:-1.25rem}
@@ -173,12 +196,28 @@ h3{font-family:var(--font-display);letter-spacing:-.025em;line-height:1.1}
 footer{border-top:1px solid var(--line);padding-block:2rem;color:var(--muted);font-size:.92rem}
 footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
 
-.no-webgl .stage, .no-webgl .tech-stage, .no-webgl .globe-wrap, .no-webgl .tech-hint, .no-webgl #stars{display:none}
+.no-webgl #replay, .no-webgl .stage, .no-webgl .tech-stage, .no-webgl .globe-wrap, .no-webgl .tech-hint, .no-webgl #stars{display:none}
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <canvas id="stars" aria-hidden="true"></canvas>
+
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-label="Welcome to Samarth Bhogte's portfolio">
+  <div class="gate-stage" id="gate-stage">
+    <canvas id="hero-canvas" role="img" aria-label="3D desk with a monitor. On the monitor: Samarth Bhogte, software engineer in Boston, click to enter."></canvas>
+  </div>
+  <div class="gate-ui">
+    <div class="gate-top">
+      <span class="logo">Samarth Bhogte<span>.</span></span>
+      <button class="link-btn" id="gate-skip" type="button">Skip intro</button>
+    </div>
+    <div class="gate-bottom">
+      <button class="btn btn-primary btn-big" id="gate-enter" type="button">Enter portfolio</button>
+      <p>or click the screen</p>
+    </div>
+  </div>
+</div>
 
 <header class="top">
   <div class="wrap">
@@ -192,7 +231,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
   </div>
 </header>
 
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="wrap hero" id="top">
     <div class="hero-copy">
       <p class="where intro-fade"><i aria-hidden="true"></i>Software engineer in Boston, MA</p>
@@ -204,9 +243,9 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
       </div>
       <p class="now intro-fade d4"><strong>Now:</strong> M.S. Information Systems at Northeastern University, finishing December 2026.</p>
     </div>
-    <div class="stage">
-      <canvas id="hero-canvas" aria-label="3D desk with a monitor typing code from the Lumina project" role="img"></canvas>
-      <p class="hint">Move your cursor to look around the desk</p>
+    <div class="stage" id="hero-stage">
+      <span class="desk-tip" id="desk-tip" aria-hidden="true"></span>
+      <p class="hint" id="desk-hint">Click the monitor, plant, chip or mug to jump to a section</p>
     </div>
   </section>
 
@@ -355,7 +394,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
 </main>
 
 <footer>
-  <div class="wrap"><span>© 2026 Samarth Bhogte</span><span>Boston, Massachusetts</span></div>
+  <div class="wrap"><span>© 2026 Samarth Bhogte, Boston, Massachusetts</span><button class="link-btn" id="replay" type="button">Replay intro</button></div>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -387,7 +426,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
 
   /* ---------- WebGL check ---------- */
   function hasGL(){ try{ var c=document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl')||c.getContext('experimental-webgl'))); }catch(e){ return false; } }
-  if (typeof THREE === 'undefined' || !hasGL()){ document.documentElement.classList.add('no-webgl'); return; }
+  if (typeof THREE === 'undefined' || !hasGL()){ document.documentElement.classList.add('no-webgl','entered'); var g0 = document.getElementById('gate'); if (g0) g0.hidden = true; return; }
 
   var root = document.documentElement;
   var tok = function(n){ return getComputedStyle(root).getPropertyValue(n).trim(); };
@@ -451,10 +490,29 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
     };
   }, true);
 
-  /* ---------- Hero: workstation ---------- */
-  addScene(document.getElementById('hero-canvas'), function(s){
+  /* ---------- Hero: workstation + intro gate ---------- */
+  var gate = document.getElementById('gate');
+  var gateStage = document.getElementById('gate-stage');
+  var heroStage = document.getElementById('hero-stage');
+  var heroCanvas = document.getElementById('hero-canvas');
+  var deskTip = document.getElementById('desk-tip');
+  var deskHint = document.getElementById('desk-hint');
+  var enterBtn = document.getElementById('gate-enter');
+  var pageEls = [document.querySelector('header.top'), document.getElementById('main'), document.querySelector('footer')];
+  if (deskHint && !finePointer) deskHint.textContent = 'Tap the monitor, plant, chip or mug to jump to a section';
+  function setLocked(on){
+    document.body.classList.toggle('gated', on);
+    pageEls.forEach(function(el){
+      if (!el) return;
+      el.inert = on;
+      if (on) el.setAttribute('aria-hidden','true'); else el.removeAttribute('aria-hidden');
+    });
+  }
+  var heroAPI = {};
+
+  addScene(heroCanvas, function(s){
     var scene = new THREE.Scene();
-    var cam = new THREE.PerspectiveCamera(32, 1, .1, 100);
+    var cam = new THREE.PerspectiveCamera(32, 1, .1, 120);
     var rig = new THREE.Group(); scene.add(rig);
     var hemi = new THREE.HemisphereLight(0xffffff, 0x203034, .75); scene.add(hemi);
     var key = new THREE.DirectionalLight(0xffffff, .8); key.position.set(4,7,6); scene.add(key);
@@ -471,14 +529,25 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
     };
     function box(w,h,d,mat,x,y,z,parent){ var me = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat); me.position.set(x,y,z); (parent||rig).add(me); return me; }
 
+    // stars, only shown during the intro
+    var SN = 420, sp = new Float32Array(SN*3);
+    for (var si=0; si<SN; si++){ sp[si*3]=(Math.random()-.5)*70; sp[si*3+1]=(Math.random()-.35)*36; sp[si*3+2]=-14-Math.random()*30; }
+    var sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(sp,3));
+    var starMat = new THREE.PointsMaterial({size:1.6, sizeAttenuation:false, transparent:true, opacity:.6, depthWrite:false});
+    var stars = new THREE.Points(sg, starMat); scene.add(stars);
+
     // desk
     box(6.4,.16,2.8,M.desk,0,0,0);
     [[-3,-1.2],[3,-1.2],[-3,1.2],[3,1.2]].forEach(function(p){ box(.14,1.6,.14,M.desk,p[0],-.88,p[1]); });
 
-    // monitor screen texture
+    /* --- monitor screen texture --- */
     var sc = document.createElement('canvas'); sc.width = 1024; sc.height = 600;
     var sx = sc.getContext('2d');
     var tex = new THREE.CanvasTexture(sc); tex.minFilter = THREE.LinearFilter; tex.generateMipmaps = false;
+    var MONO = 'ui-monospace, Menlo, Consolas, monospace';
+    var T = {};
+    function rr(x,y,w,h,r){ sx.beginPath(); sx.moveTo(x+r,y); sx.arcTo(x+w,y,x+w,y+h,r); sx.arcTo(x+w,y+h,x,y+h,r); sx.arcTo(x,y+h,x,y,r); sx.arcTo(x,y,x+w,y,r); sx.closePath(); }
+
     var C = {k:'#EBA35E', s:'#5FE0C8', f:'#9CC8FF', p:'#D5E2E4', d:'#5FE0C8', n:'#3C5560'};
     var CODE = [
       [['from ','k'],['fastapi ','p'],['import ','k'],['FastAPI','f']],
@@ -494,14 +563,15 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
       [['    return ','k'],['{','p'],['"answer"','s'],[': answer, ','p'],['"sources"','s'],[': cite(docs)}','p']]
     ];
     var TOTAL = CODE.reduce(function(a,l){ return a + l.reduce(function(b,sg){ return b + sg[0].length; },0) + 1; },0);
-    var typed = reduce ? TOTAL : 0, lastDrawn = -1, lastBlink = -1;
-    function drawScreen(n, blink){
+
+    function drawCode(n, blink, hint){
+      sx.textAlign = 'left'; sx.textBaseline = 'alphabetic';
       sx.fillStyle = '#061015'; sx.fillRect(0,0,1024,600);
       sx.fillStyle = '#0D1D24'; sx.fillRect(0,0,1024,58);
       ['#E0705A','#EBA35E','#5FE0C8'].forEach(function(c,i){ sx.fillStyle=c; sx.beginPath(); sx.arc(34+i*28,29,8,0,7); sx.fill(); });
       sx.fillStyle = '#123039'; sx.fillRect(130,10,210,48);
       sx.fillStyle = '#D5E2E4'; sx.font = '500 22px system-ui, sans-serif'; sx.fillText('lumina / api.py',150,42);
-      sx.font = '22px ui-monospace, Menlo, Consolas, monospace';
+      sx.font = '22px ' + MONO;
       var left = n, y = 110, cx = 90, cy = 110;
       for (var i=0;i<CODE.length;i++){
         sx.fillStyle = C.n; sx.fillText(String(i+1).padStart(2,' '),30,y);
@@ -516,11 +586,85 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
         left -= 1; y += 40;
       }
       if (blink){ sx.fillStyle = '#5FE0C8'; sx.fillRect(cx+2, cy-20, 12, 26); }
+      if (hint){
+        sx.fillStyle = 'rgba(6,16,21,.72)'; sx.fillRect(0,58,1024,542);
+        sx.font = '700 34px ' + FONT; sx.textAlign = 'center'; sx.textBaseline = 'middle';
+        var label = 'Open my projects', w = sx.measureText(label).width + 80;
+        rr(512-w/2, 300, w, 76, 38); sx.fillStyle = '#5FE0C8'; sx.fill();
+        sx.fillStyle = '#061015'; sx.fillText(label, 512, 339);
+      }
       tex.needsUpdate = true;
     }
-    drawScreen(typed, true);
 
-    var mon = new THREE.Group(); mon.position.set(0,1.5,-.55); mon.rotation.x = -.04; rig.add(mon);
+    var BOOT = [['Booting samarth.dev', false],['> loading projects', true],['> loading experience', true],['> loading toolkit', true],['> all systems ready', false]];
+    var BOOT_STEP = .32, BOOT_DUR = BOOT.length*BOOT_STEP + .45;
+    function drawBoot(bt){
+      sx.fillStyle = '#061015'; sx.fillRect(0,0,1024,600);
+      sx.textAlign = 'left'; sx.textBaseline = 'alphabetic';
+      sx.font = '26px ' + MONO;
+      var shown = Math.min(BOOT.length, Math.floor(bt/BOOT_STEP)+1), y = 130;
+      for (var i=0;i<shown;i++){
+        var L = BOOT[i];
+        sx.fillStyle = i === 0 ? '#EBA35E' : '#D5E2E4';
+        sx.fillText(L[0], 80, y);
+        if (L[1]){
+          var w = sx.measureText(L[0]).width, dw = sx.measureText('.').width, dots = '';
+          var count = Math.max(2, Math.floor((700 - 80 - w) / dw) - 1);
+          for (var d=0; d<count; d++) dots += '.';
+          sx.fillStyle = '#3C5560'; sx.fillText(' ' + dots, 80 + w, y);
+          sx.fillStyle = '#5FE0C8'; sx.fillText('ok', 720, y);
+        }
+        y += 56;
+      }
+      if (Math.floor(bt*3) % 2 === 0){ sx.fillStyle = '#5FE0C8'; sx.fillRect(80, y-24, 14, 30); }
+      tex.needsUpdate = true;
+    }
+
+    var TRACES = [
+      [[40,540],[210,540],[250,500],[400,500]],
+      [[990,80],[850,80],[810,120],[690,120]],
+      [[30,150],[130,150],[165,185],[165,300]],
+      [[995,460],[905,460],[870,495],[870,590]]
+    ];
+    function drawLock(t, hover, a){
+      if (a < 1) drawBoot(BOOT_DUR);
+      sx.save(); sx.globalAlpha = a;
+      var g = sx.createLinearGradient(0,0,0,600); g.addColorStop(0,'#0F2B36'); g.addColorStop(1,'#061015');
+      sx.fillStyle = g; sx.fillRect(0,0,1024,600);
+      sx.strokeStyle = 'rgba(95,224,200,.14)'; sx.lineWidth = 3; sx.fillStyle = 'rgba(95,224,200,.22)';
+      TRACES.forEach(function(tr){
+        sx.beginPath(); sx.moveTo(tr[0][0],tr[0][1]); for (var i=1;i<tr.length;i++) sx.lineTo(tr[i][0],tr[i][1]); sx.stroke();
+        var e = tr[tr.length-1]; sx.beginPath(); sx.arc(e[0],e[1],7,0,7); sx.fill();
+      });
+      var d = new Date();
+      sx.textAlign = 'center'; sx.textBaseline = 'alphabetic';
+      sx.fillStyle = '#E3EDEE'; sx.font = '700 104px ' + FONT;
+      sx.fillText(d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}), 512, 178);
+      sx.fillStyle = '#90A7AD'; sx.font = '500 26px ' + FONT;
+      sx.fillText(d.toLocaleDateString([], {weekday:'long', month:'long', day:'numeric'}), 512, 222);
+      sx.fillStyle = '#E3EDEE'; sx.font = '800 50px ' + FONT; sx.fillText('Samarth Bhogte', 512, 318);
+      sx.fillStyle = '#90A7AD'; sx.font = '500 25px ' + FONT; sx.fillText('Software engineer in Boston', 512, 358);
+      var pulse = reduce ? .5 : (Math.sin(t*3)+1)/2;
+      var bw = hover ? 340 : 316, bh = hover ? 76 : 70, by = 450;
+      rr(512-bw/2-12, by-bh/2-12, bw+24, bh+24, (bh+24)/2);
+      sx.fillStyle = 'rgba(95,224,200,' + (.1 + pulse*.2) + ')'; sx.fill();
+      rr(512-bw/2, by-bh/2, bw, bh, bh/2); sx.fillStyle = hover ? '#8CF2DF' : '#5FE0C8'; sx.fill();
+      sx.fillStyle = '#061015'; sx.font = '700 29px ' + FONT; sx.textBaseline = 'middle';
+      sx.fillText('Click to enter', 512, by+2);
+      sx.restore();
+      tex.needsUpdate = true;
+    }
+    function drawLoading(p){
+      sx.fillStyle = T.bg; sx.fillRect(0,0,1024,600);
+      sx.textAlign = 'center'; sx.textBaseline = 'middle';
+      sx.fillStyle = T.ink; sx.font = '800 64px ' + FONT; sx.fillText('Samarth Bhogte', 512, 270);
+      rr(332, 330, 360, 8, 4); sx.fillStyle = T.s2; sx.fill();
+      if (p > 0){ rr(332, 330, Math.max(8, 360*p), 8, 4); sx.fillStyle = T.mint; sx.fill(); }
+      tex.needsUpdate = true;
+    }
+
+    /* --- monitor --- */
+    var mon = new THREE.Group(); mon.position.set(0,1.5,-.55); rig.add(mon);
     box(3.3,1.95,.12,M.dark,0,0,0,mon);
     box(1.2,.8,.2,M.dark,0,-.1,-.14,mon);
     var screen = new THREE.Mesh(new THREE.PlaneGeometry(3.12,1.8), new THREE.MeshBasicMaterial({map:tex}));
@@ -528,15 +672,14 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
     box(.16,.52,.12,M.dark,0,.34,-.72);
     box(1,.05,.55,M.copper,0,.105,-.66);
 
-    // keyboard
+    /* --- keyboard --- */
     box(2.2,.08,.72,M.dark,-.15,.12,.55);
     var keyGeo = new THREE.BoxGeometry(.12,.05,.12);
     var COLS = 15, ROWS = 4, NK = COLS*ROWS;
     var keys = new THREE.InstancedMesh(keyGeo, M.key, NK); rig.add(keys);
     var press = new Float32Array(NK), dummy = new THREE.Object3D();
-    var space = box(.95,.05,.12,M.key,-.15,.185,.84);
-    var accentKeys = [ [-.15+(0-7)*.14, .55+(0-1.5)*.13], [-.15+(14-7)*.14, .55+(2-1.5)*.13] ];
-    accentKeys.forEach(function(p){ box(.12,.06,.12,M.copper,p[0],.19,p[1]); });
+    box(.95,.05,.12,M.key,-.15,.185,.84);
+    [[-.15+(0-7)*.14, .55+(0-1.5)*.13], [-.15+(14-7)*.14, .55+(2-1.5)*.13]].forEach(function(p){ box(.12,.06,.12,M.copper,p[0],.19,p[1]); });
     function placeKeys(){
       for (var j=0;j<ROWS;j++) for (var i=0;i<COLS;i++){
         var idx = j*COLS+i;
@@ -548,27 +691,29 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
     }
     placeKeys();
 
-    // mouse + pad
-    box(.85,.02,.72,M.mint,1.6,.09,.6);
+    /* --- mouse + pad --- */
+    box(.85,.02,.72,M.key,1.6,.09,.6);
     var mouse = new THREE.Mesh(new THREE.SphereGeometry(.16,20,14), M.dark); mouse.scale.set(1,.45,1.45); mouse.position.set(1.6,.14,.62); rig.add(mouse);
 
-    // mug
-    var mug = new THREE.Mesh(new THREE.CylinderGeometry(.2,.18,.42,28), M.copper); mug.position.set(-2.45,.29,.35); rig.add(mug);
-    var handle = new THREE.Mesh(new THREE.TorusGeometry(.12,.035,8,20), M.copper); handle.position.set(-2.22,.3,.35); rig.add(handle);
-    var coffee = new THREE.Mesh(new THREE.CircleGeometry(.18,24), M.dark); coffee.rotation.x = -Math.PI/2; coffee.position.set(-2.45,.47,.35); rig.add(coffee);
+    /* --- mug (contact) --- */
+    var mugG = new THREE.Group(); mugG.position.set(-2.45,.08,.35); rig.add(mugG);
+    var mug = new THREE.Mesh(new THREE.CylinderGeometry(.2,.18,.42,28), M.copper); mug.position.y = .21; mugG.add(mug);
+    var handle = new THREE.Mesh(new THREE.TorusGeometry(.12,.035,8,20), M.copper); handle.position.set(.23,.22,0); mugG.add(handle);
+    var coffee = new THREE.Mesh(new THREE.CircleGeometry(.18,24), M.dark); coffee.rotation.x = -Math.PI/2; coffee.position.y = .39; mugG.add(coffee);
 
-    // plant
-    var pot = new THREE.Mesh(new THREE.CylinderGeometry(.24,.18,.38,24), M.dark); pot.position.set(2.55,.27,-.7); rig.add(pot);
+    /* --- plant (experience) --- */
+    var plant = new THREE.Group(); plant.position.set(2.55,.08,-.7); rig.add(plant);
+    var pot = new THREE.Mesh(new THREE.CylinderGeometry(.24,.18,.38,24), M.dark); pot.position.y = .19; plant.add(pot);
     for (var l=0;l<6;l++){
       var leaf = new THREE.Mesh(new THREE.SphereGeometry(.16,12,8), M.mint);
       leaf.scale.set(.45,1.5,.2);
       var a = l/6*Math.PI*2;
-      leaf.position.set(2.55+Math.cos(a)*.14, .7+(l%2)*.08, -.7+Math.sin(a)*.14);
+      leaf.position.set(Math.cos(a)*.14, .62+(l%2)*.08, Math.sin(a)*.14);
       leaf.rotation.set(Math.sin(a)*.5, -a, Math.cos(a)*.5);
-      rig.add(leaf);
+      plant.add(leaf);
     }
 
-    // floating chip with SB label
+    /* --- floating chip (toolkit) --- */
     var chip = new THREE.Group(); chip.position.set(-2.55,2.65,-.4); rig.add(chip);
     box(.9,.12,.9,M.dark,0,0,0,chip);
     for (var p=0;p<6;p++){
@@ -587,55 +732,211 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
     drawChip();
     var chipTop = new THREE.Mesh(new THREE.PlaneGeometry(.78,.78), new THREE.MeshBasicMaterial({map:ltex, transparent:true}));
     chipTop.rotation.x = -Math.PI/2; chipTop.position.y = .062; chip.add(chipTop);
-    chip.rotation.set(.5,.3,.15);
+    chip.rotation.set(.75,.3,.12);
 
     var ico = new THREE.Mesh(new THREE.IcosahedronGeometry(.45,0), M.wire); ico.position.set(2.75,2.95,-.9); rig.add(ico);
     var ring = new THREE.Mesh(new THREE.TorusGeometry(.32,.05,10,40), M.copper); ring.position.set(3.05,1.95,-1.4); rig.add(ring);
+
+    /* --- clickable desk objects --- */
+    var HS = [
+      {key:'monitor', obj:mon, href:'#work', label:'See my projects', at:function(v){ return v.set(0,2.62,-.55); }},
+      {key:'plant', obj:plant, href:'#experience', label:'See my experience', at:function(v){ return v.set(2.55,1.2,-.7); }},
+      {key:'chip', obj:chip, href:'#toolkit', label:'See my toolkit', at:function(v){ return v.copy(chip.position).add(new THREE.Vector3(0,.62,0)); }},
+      {key:'mug', obj:mugG, href:'#contact', label:'Get in touch', at:function(v){ return v.set(-2.45,.78,.35); }}
+    ];
+    var hsMeshes = [];
+    HS.forEach(function(h){ h.sc = 1; h.obj.traverse(function(o){ if (o.isMesh){ o.userData.hs = h; hsMeshes.push(o); } }); });
 
     s.theme = function(){
       M.desk.color = col('--desk'); M.copper.color = col('--copper'); M.mint.color = col('--mint');
       M.key.color = col('--key'); M.wire.color = col('--mint');
       glow.color = col('--mint'); warm.color = col('--copper');
       hemi.groundColor = col('--bg');
-      drawChip();
+      starMat.color = col('--star'); var hsl = {}; col('--bg').getHSL(hsl); starMat.opacity = hsl.l > .5 ? .35 : .65;
+      T.bg = tok('--bg'); T.ink = tok('--ink'); T.mint = tok('--mint'); T.s2 = tok('--surface-2');
+      drawChip(); lastSig = -1;
     };
+    var lastSig = -1;
     s.theme();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawChip);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ drawChip(); lastSig = -1; });
 
-    var baseZ = 9.5;
-    s.resize = function(w,h){ var asp = w/h; cam.aspect = asp; baseZ = 9.6 * Math.max(1, 1.3/asp); cam.updateProjectionMatrix(); };
-    var intro = reduce ? 1 : 0, nextKey = 0, blinkT = 0;
+    /* --- state --- */
+    var mode = 'gate', finishing = false;
+    var gateT = 0, bootT = 0, enterT = 0, intro = reduce ? 1 : 0, typed = reduce ? TOTAL : 0;
+    var screenMode = 'boot', drawAcc = 0, nextKey = 0, hoverMon = false, hovered = null;
+    var look = new THREE.Vector3(0,1.15,0), lookStart = new THREE.Vector3(), camStart = new THREE.Vector3();
+    var endPos = new THREE.Vector3(), screenCenter = new THREE.Vector3(0,1.5,-.488), rigStart = {x:0, y:0};
+    var gateZ = 10.6, endZ = 3, baseZ = 9.6, tmpV = new THREE.Vector3();
+
+    s.resize = function(w,h){
+      var asp = w/h, tn = Math.tan(THREE.MathUtils.degToRad(16));
+      cam.aspect = asp; cam.updateProjectionMatrix();
+      baseZ = 9.6 * Math.max(1, 1.3/asp);
+      var W = asp < 1 ? 4.6 : 7.8;
+      gateZ = Math.max(2.75/tn, (W/2)/(tn*asp)) + 1.4;
+      endZ = Math.min(.9/tn, 1.56/(tn*asp)) * .86;
+    };
+
+    function toPageMode(){
+      mode = 'page'; finishing = false; screenMode = 'code'; lastSig = -1;
+      typed = reduce ? TOTAL : 0; intro = reduce ? 1 : 0;
+    }
+    function leaveGate(){
+      finishing = true; hoverMon = false; heroCanvas.style.cursor = 'default';
+      root.classList.add('entered');
+      setLocked(false);
+      gate.classList.add('leaving');
+      var m = document.getElementById('main'); if (m) m.focus({preventScroll:true});
+      setTimeout(function(){
+        gate.hidden = true; gate.classList.remove('leaving','busy');
+        heroStage.insertBefore(heroCanvas, heroStage.firstChild);
+        toPageMode();
+      }, reduce ? 60 : 620);
+    }
+    heroAPI.isGate = function(){ return mode === 'gate' && !finishing; };
+    heroAPI.toPage = function(){
+      gate.hidden = true; setLocked(false); root.classList.add('entered');
+      heroStage.insertBefore(heroCanvas, heroStage.firstChild); toPageMode();
+    };
+    heroAPI.openGate = function(){
+      root.classList.remove('entered');
+      gate.hidden = false; gate.classList.remove('leaving','busy');
+      gateStage.appendChild(heroCanvas);
+      setLocked(true);
+      try { window.scrollTo({top:0, behavior:'instant'}); } catch(e){ window.scrollTo(0,0); }
+      mode = 'gate'; finishing = false; hovered = null; deskTip.classList.remove('show');
+      gateT = reduce ? 1 : 0; bootT = reduce ? 99 : 0; screenMode = 'boot'; drawAcc = 1;
+      rig.rotation.set(0,0,0);
+      setTimeout(function(){ enterBtn.focus({preventScroll:true}); }, 60);
+    };
+    heroAPI.enter = function(instant){
+      if (mode !== 'gate' || finishing) return;
+      gate.classList.add('busy');
+      if (instant || reduce){ leaveGate(); return; }
+      mode = 'entering'; enterT = 0; screenMode = 'loading';
+      camStart.copy(cam.position); lookStart.copy(look);
+      rigStart.x = rig.rotation.x; rigStart.y = rig.rotation.y;
+      hoverMon = false; heroCanvas.style.cursor = 'default';
+    };
+
+    /* --- picking --- */
+    var rc = new THREE.Raycaster(), ndc2 = new THREE.Vector2();
+    function pickHS(e){
+      var r = heroCanvas.getBoundingClientRect();
+      ndc2.set(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1);
+      rc.setFromCamera(ndc2, cam);
+      var hit = rc.intersectObjects(hsMeshes, false)[0];
+      return hit ? hit.object.userData.hs : null;
+    }
+    heroCanvas.addEventListener('pointermove', function(e){
+      var h = pickHS(e);
+      if (mode === 'gate' && !finishing){
+        hoverMon = !!(h && h.key === 'monitor'); hovered = null;
+        heroCanvas.style.cursor = hoverMon ? 'pointer' : 'default'; return;
+      }
+      hovered = mode === 'page' ? h : null;
+      heroCanvas.style.cursor = hovered ? 'pointer' : 'default';
+    });
+    heroCanvas.addEventListener('pointerleave', function(){ hovered = null; hoverMon = false; });
+    heroCanvas.addEventListener('click', function(e){
+      var h = pickHS(e);
+      if (mode === 'gate' && !finishing){ if (h && h.key === 'monitor') heroAPI.enter(false); return; }
+      if (mode === 'page' && h){
+        var tgt = document.querySelector(h.href);
+        if (tgt) tgt.scrollIntoView({behavior: reduce ? 'auto' : 'smooth'});
+      }
+    });
+
+    function ease3(x){ return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x+2, 3)/2; }
+
     s.render = function(t, dt){
+      dt = dt || 0;
+      pointer.x += (pointer.tx - pointer.x) * .05; pointer.y += (pointer.ty - pointer.y) * .05;
+      stars.visible = mode !== 'page';
+
+      if (mode === 'gate'){
+        if (!reduce) gateT = Math.min(1, gateT + dt/1.6);
+        var ge = 1 - Math.pow(1-gateT, 3);
+        cam.position.set(0, 2.25 + .9*(1-ge), gateZ*(1 + .3*(1-ge)));
+        look.set(0,1.15,0); cam.lookAt(look);
+        var sw = finePointer ? 0 : Math.sin(t*.4)*.12;
+        var ty = reduce || finishing ? 0 : pointer.x*.22 + sw, tx = reduce || finishing ? 0 : pointer.y*.04;
+        rig.rotation.y += (ty - rig.rotation.y) * .06; rig.rotation.x += (tx - rig.rotation.x) * .06;
+        bootT += dt;
+      } else if (mode === 'entering'){
+        enterT = Math.min(1, enterT + dt/1.7);
+        var k = ease3(enterT);
+        endPos.set(0, 1.5, -.488 + endZ);
+        cam.position.lerpVectors(camStart, endPos, k);
+        look.lerpVectors(lookStart, screenCenter, k); cam.lookAt(look);
+        rig.rotation.x = rigStart.x * (1-k); rig.rotation.y = rigStart.y * (1-k);
+        if (enterT >= 1 && !finishing) leaveGate();
+      } else {
+        if (!reduce) intro = Math.min(1, intro + dt/1.8);
+        var e = 1 - Math.pow(1-intro, 3);
+        cam.position.set(0, 2.5 + 1.6*(1-e), baseZ * (1 + .55*(1-e)));
+        look.set(0,1,0); cam.lookAt(look);
+        var sway = finePointer ? 0 : Math.sin(t*.35)*.25;
+        var ry = reduce ? -.3 : -.3 + pointer.x*.38 + sway - (1-e)*.6;
+        rig.rotation.y += (ry - rig.rotation.y) * .08;
+        rig.rotation.x += ((reduce ? 0 : pointer.y*.06) - rig.rotation.x) * .08;
+        if (!reduce){ typed += dt*30; if (typed > TOTAL + 70) typed = 0; }
+      }
+
+      // keyboard presses while something is being typed
+      var typing = (screenMode === 'code' && typed < TOTAL) || (screenMode === 'boot' && bootT < BOOT_DUR);
       if (!reduce){
-        intro = Math.min(1, intro + dt/1.8);
-        typed += dt*30;
-        if (typed > TOTAL + 70) typed = 0;
         nextKey -= dt;
-        if (nextKey <= 0 && typed < TOTAL){ press[(Math.random()*NK)|0] = 1; nextKey = .07 + Math.random()*.08; }
+        if (typing && nextKey <= 0){ press[(Math.random()*NK)|0] = 1; nextKey = .07 + Math.random()*.08; }
         for (var i=0;i<NK;i++) press[i] = Math.max(0, press[i] - dt*7);
         placeKeys();
-      }
-      var e = 1 - Math.pow(1-intro, 3);
-      var z = baseZ * (1 + .55*(1-e));
-      cam.position.set(0, 2.5 + 1.6*(1-e), z);
-      cam.lookAt(0, 1.0, 0);
-
-      pointer.x += (pointer.tx - pointer.x) * .05; pointer.y += (pointer.ty - pointer.y) * .05;
-      var sway = finePointer ? 0 : Math.sin(t*.35)*.25;
-      var ry = reduce ? -.3 : -.3 + pointer.x*.38 + sway - (1-e)*.6;
-      rig.rotation.y += (ry - rig.rotation.y) * .08;
-      rig.rotation.x += ((reduce?0:pointer.y*.06) - rig.rotation.x) * .08;
-
-      if (!reduce){
-        chip.position.y = 2.65 + Math.sin(t*1.1)*.12; chip.rotation.y = t*.4;
+        chip.position.y = 2.65 + Math.sin(t*1.1)*.12; chip.rotation.y = .3 + Math.sin(t*.6)*.35;
         ico.rotation.x = t*.5; ico.rotation.y = t*.3; ico.position.y = 2.95 + Math.sin(t*.9+1)*.1;
         ring.rotation.x = t*.6; ring.rotation.z = t*.25;
       }
-      var n = Math.floor(Math.min(typed, TOTAL)), bl = Math.floor(t*2)%2;
-      if (n !== lastDrawn || bl !== lastBlink){ drawScreen(n, bl === 0); lastDrawn = n; lastBlink = bl; }
+
+      // hover growth on desk objects
+      HS.forEach(function(h){
+        var target = (mode === 'page' && hovered === h) ? 1.08 : (h.key === 'monitor' && hoverMon) ? 1.03 : 1;
+        h.sc += (target - h.sc) * Math.min(1, dt*12 || 1);
+        h.obj.scale.setScalar(h.sc);
+      });
+
+      // screen
+      drawAcc += dt;
+      if (screenMode === 'code'){
+        var n = Math.floor(Math.min(typed, TOTAL)), bl = Math.floor(t*2) % 2, hv = hovered && hovered.key === 'monitor' ? 1 : 0;
+        var sig = n*4 + bl*2 + hv;
+        if (sig !== lastSig){ drawCode(n, bl === 0, hv); lastSig = sig; }
+      } else if (screenMode === 'boot'){
+        if (drawAcc >= .05){ drawAcc = 0; if (bootT < BOOT_DUR) drawBoot(bootT); else drawLock(t, hoverMon, reduce ? 1 : Math.min(1, (bootT-BOOT_DUR)/.4)); }
+      } else if (screenMode === 'loading'){
+        drawLoading(Math.min(1, Math.max(0, (enterT - .1)/.7)));
+      }
+
+      scene.updateMatrixWorld();
+      if (mode === 'page' && hovered && finePointer){
+        hovered.at(tmpV); rig.localToWorld(tmpV); tmpV.project(cam);
+        var px = (tmpV.x*.5+.5)*s.w, py = (-tmpV.y*.5+.5)*s.h;
+        deskTip.textContent = hovered.label;
+        deskTip.style.transform = 'translate(' + px + 'px,' + py + 'px) translate(-50%,-100%)';
+        deskTip.classList.add('show');
+      } else deskTip.classList.remove('show');
+
       s.renderer.render(scene, cam);
     };
   });
+
+  if (heroAPI.openGate){
+    enterBtn.addEventListener('click', function(){ heroAPI.enter(false); });
+    document.getElementById('gate-skip').addEventListener('click', function(){ heroAPI.enter(true); });
+    var replay = document.getElementById('replay');
+    if (replay) replay.addEventListener('click', function(){ heroAPI.openGate(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && heroAPI.isGate()) heroAPI.enter(true); });
+    if (location.hash.length > 1) heroAPI.toPage(); else heroAPI.openGate();
+  } else {
+    gate.hidden = true; root.classList.add('entered');
+  }
 
   /* ---------- Toolkit: skill balls ---------- */
   var SKILLS = ['React','React Native','TypeScript','JavaScript','Node.js','Python','Java','Next.js','FastAPI','LangChain','MongoDB','AWS S3'];
